@@ -1,13 +1,25 @@
 @echo off
-echo Build and Run 
-g++ -o bin\main main.cpp src\game.cpp src\map.cpp src\camera.cpp src\player.cpp -lsfml-graphics -lsfml-window -lsfml-system
+echo =============================
+echo 🚀 BUILDING THE SFML GAME...
+echo =============================
 
+:: Compile the C++ source code
+g++ -Iinclude -Llib -o bin\main.exe main.cpp src\*.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+
+:: Kiểm tra lỗi biên dịch
 if %ERRORLEVEL% NEQ 0 (
-    echo Compile Error
+    echo ❌ COMPILE ERROR!
     pause
     exit /b %ERRORLEVEL%
 )
 
-echo Run Game:
+:: Copy các DLL vào thư mục chạy
+echo ✅ Copying runtime DLLs to bin\...
+xcopy /Y dll\*.dll bin\
+
+:: Chạy game
+echo =============================
+echo 🎮 RUNNING THE GAME...
+echo =============================
 bin\main.exe
 pause
