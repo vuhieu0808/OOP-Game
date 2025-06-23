@@ -17,7 +17,8 @@ Game::Game() :
     
     // Thiết lập bounds cho camera = kích thước map
     camera.setBounds(sf::FloatRect(0, 0, gameMap.getMapSize().x, gameMap.getMapSize().y));
-    
+
+    std::cerr << gameMap.getMapSize().x << ' ' << gameMap.getMapSize().y << '\n';
 
     // Đặt vị trí ban đầu cho player từ map
     player.setPosition(gameMap.getPlayerStartPos());

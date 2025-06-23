@@ -177,6 +177,7 @@ void Player::update(float deltaTime) {
 
     // Cập nhật vị trí cuối cùng
     shape.setPosition(newPosition);
+    // std::cerr << newPosition.x << ' ' << newPosition.y << '\n';
 
     // Cập nhật thanh tích lực
     if (isChargingJump) {

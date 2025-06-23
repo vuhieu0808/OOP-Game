@@ -3,21 +3,17 @@
 #include <iostream>
 
 Map::Map() : tileSize(12.f, 12.f) {
-    // Thiết lập màu mặc định cho các tile
-    tileColors['0'] = sf::Color::Red;
-    tileColors['1'] = sf::Color::Blue;
-    tileColors['2'] = sf::Color::Green;
-    tileColors['3'] = sf::Color::Yellow;
-    tileColors['4'] = sf::Color::Magenta;
-    tileColors['5'] = sf::Color::Cyan;
-    tileColors['6'] = sf::Color(150, 75, 0);  // Brown
-    tileColors['7'] = sf::Color::White;
-    tileColors['8'] = sf::Color(128, 128, 128);  // Gray
-    tileColors['9'] = sf::Color::Black;
+    // Không cần thiết lập màu mặc định nữa
 }
 
-void Map::setTileColor(char tileChar, sf::Color color) {
-    tileColors[tileChar] = color;
+bool Map::loadTexture(char tileChar, const std::string& filename) {
+    sf::Texture texture;
+    if (!texture.loadFromFile(filename)) {
+        std::cerr << "Failed to load texture: " << filename << std::endl;
+        return false;
+    }
+    tileTextures[tileChar] = texture;
+    return true;
 }
 
 bool Map::loadFromFile(const std::string& filename) {
@@ -28,18 +24,13 @@ bool Map::loadFromFile(const std::string& filename) {
     }
 
     grid.clear();
+    tiles.clear();
     std::string line;
     int y = 0;
     
     while (std::getline(file, line)) {
         // Bỏ qua các dòng metadata (bắt đầu bằng w:, h:, s:)
-        if (line.find("w:") == 0 || line.find("h:") == 0 || line.find("s:") == 0) {
-            if (line.find("s:") == 0) {
-                std::string texturePath = line.substr(2);
-                if (!tilesetTexture.loadFromFile(texturePath)) {
-                    std::cerr << "Failed to load tileset texture: " << texturePath << std::endl;
-                }
-            }
+        if (line.find("w:") == 0 || line.find("h:") == 0) {
             continue;
         }
 
@@ -55,22 +46,32 @@ bool Map::loadFromFile(const std::string& filename) {
         y++;
     }
 
-    // Tạo các shape từ grid
+    // Tải tất cả texture cần thiết trước
+    for (char c = '0'; c <= '9'; c++) {
+        std::string path = "media/tile/" + std::string(1, c) + ".png";
+        loadTexture(c, path);
+    }
+    for (char c = 'a'; c <= 'e'; c++) {
+        std::string path = "media/tile/" + std::string(1, c) + ".png";
+        loadTexture(c, path);
+    }
+
+    // Tạo các sprite từ grid
     for (int row = 0; row < grid.size(); ++row) {
         for (int col = 0; col < grid[row].size(); ++col) {
             char tileChar = grid[row][col];
-            if (tileChar != ' ') {
-                sf::RectangleShape tileShape(tileSize);
-                tileShape.setPosition(col * tileSize.x, row * tileSize.y);
+            if (tileChar != ' ' && tileTextures.find(tileChar) != tileTextures.end()) {
+                sf::Sprite tileSprite(tileTextures[tileChar]);
+                tileSprite.setPosition(col * tileSize.x, row * tileSize.y);
                 
-                // Đặt màu từ map màu hoặc màu mặc định
-                if (tileColors.find(tileChar) != tileColors.end()) {
-                    tileShape.setFillColor(tileColors[tileChar]);
-                } else {
-                    tileShape.setFillColor(sf::Color(100, 100, 100)); // Màu mặc định
-                }
+                // Scale sprite để phù hợp với kích thước tile
+                sf::Vector2u texSize = tileTextures[tileChar].getSize();
+                tileSprite.setScale(
+                    tileSize.x / texSize.x,
+                    tileSize.y / texSize.y
+                );
                 
-                tiles.push_back(tileShape);
+                tiles.push_back(tileSprite);
             }
         }
     }
@@ -99,9 +100,7 @@ sf::Vector2f Map::getMapSize() const {
 std::vector<sf::FloatRect> Map::getSolidTiles() const {
     std::vector<sf::FloatRect> solids;
     for (const auto& tile : tiles) {
-        if (tile.getFillColor() != sf::Color::Transparent) { // Chỉ xét tile không trong suốt
-            solids.push_back(tile.getGlobalBounds());
-        }
+        solids.push_back(tile.getGlobalBounds());
     }
     return solids;
 }

@@ -11,7 +11,6 @@ private:
     // Hình dạng và thuộc tính nhân vật
     sf::RectangleShape shape;
     sf::Vector2f velocity;
-    bool isGrounded;
     
     // Hệ thống tích lực nhảy
     sf::RectangleShape jumpChargeBar;
@@ -19,12 +18,13 @@ private:
     float jumpCharge;
     bool isChargingJump;
     int moveDirection;
+    bool isGrounded;
     bool isJumping;     // Trạng thái đang nhảy
     
     // Các hằng số vật lý
     const float gravity = 0.5f;
     const float baseJumpStrength = -2.f;
-    const float maxJumpStrength = -16.f;
+    const float maxJumpStrength = -20.f;
     const float chargeRate = 0.01667f;
     const float maxCharge = 1.5f;
     const float moveSpeed = 3.f;

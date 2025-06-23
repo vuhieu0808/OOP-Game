@@ -9,15 +9,14 @@ class Map {
 private:
     std::vector<std::string> grid;  // Lưu trữ bản đồ dạng text
     sf::Vector2f tileSize;          // Kích thước mỗi tile
-    sf::Texture tilesetTexture;     // Texture chứa tileset
-    std::vector<sf::RectangleShape> tiles;  // Các tile đã được tạo
+    std::vector<sf::Sprite> tiles;  // Thay đổi từ RectangleShape sang Sprite
     sf::Vector2f playerStartPos;    // Vị trí bắt đầu của player
 
-    std::unordered_map<char, sf::Color> tileColors; // Map màu cho từng loại tile
+    std::unordered_map<char, sf::Texture> tileTextures; // Map texture cho từng loại tile
 
 public:
     Map();
-    void setTileColor(char tileChar, sf::Color color);
+    bool loadTexture(char tileChar, const std::string& filename);
     bool loadFromFile(const std::string& filename);
     void draw(sf::RenderWindow& window);
     sf::Vector2f getPlayerStartPos() const;
