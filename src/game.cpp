@@ -9,6 +9,11 @@ Game::Game() :
 {
     window.setFramerateLimit(60);
     
+    player.loadTextures("media/player/idle.png", 
+                        "media/player/walk.png", 
+                        "media/player/walk.png", 
+                        "media/player/charge.png");
+
     backgroundTexture.loadFromFile("media/background.jpg");
     backgroundSprite.setTexture(backgroundTexture);
 }

@@ -11,7 +11,6 @@ Player::Player(sf::Vector2f position, Camera& cam, const Map& gameMap) :
 {
     // Thiết lập hình dạng nhân vật
     shape.setSize(sf::Vector2f(32.f, 32.f));
-    shape.setFillColor(sf::Color::Green);
     shape.setPosition(position);
     velocity = sf::Vector2f(0.f, 0.f);
 
@@ -23,20 +22,57 @@ Player::Player(sf::Vector2f position, Camera& cam, const Map& gameMap) :
     jumpChargeBarBorder.setFillColor(sf::Color::Black);
 }
 
+bool Player::loadTextures(
+    const std::string& idleTex = "media/player/idle.png",
+    const std::string& walkTex = "media/player/walk.png",
+    const std::string& jumpTex = "media/player/walk.png",
+    const std::string& chargeTex = "media/player/charge.png"
+) {
+    if (!idleTexture.loadFromFile(idleTex) ||
+        !walkTexture.loadFromFile(walkTex) ||
+        !jumpTexture.loadFromFile(jumpTex) ||
+        !chargeTexture.loadFromFile(chargeTex)) {
+        return false;
+    }
+    
+    // Mặc định texture idle ban đầu
+    shape.setTexture(&idleTexture);
+    return true;
+}
+
 void Player::handleInput() {
     // Xử lý di chuyển thông thường khi không tích lực
     if (!isChargingJump && isGrounded) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             velocity.x = -moveSpeed;
             moveDirection = -1; // Lưu hướng trái
+            isFacingRight = false;
+            shape.setTexture(&walkTexture);
+            shape.setScale(-1.f, 1.f);
+            shape.setOrigin(shape.getSize().x, 0.f);
         } 
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             velocity.x = moveSpeed;
             moveDirection = 1; // Lưu hướng phải
+            isFacingRight = true;
+            shape.setTexture(&walkTexture);
+            shape.setScale(1.f, 1.f);
+            shape.setOrigin(0.f, 0.f);
         }
         else {
             velocity.x = 0.f;
             moveDirection = 0; // Không di chuyển ngang
+            if (isGrounded) {
+                shape.setTexture(&idleTexture);
+                if (!isFacingRight) {
+                    shape.setScale(-1.f, 1.f);
+                    shape.setOrigin(shape.getSize().x, 0.f);
+                } 
+                else {
+                    shape.setScale(1.f, 1.f);
+                    shape.setOrigin(0.f, 0.f);
+                }
+            }
         }
     }
 
@@ -44,9 +80,15 @@ void Player::handleInput() {
     if (isChargingJump && isGrounded) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
             moveDirection = -1;
+            isFacingRight = false;
+            shape.setScale(-1.f, 1.f);
+            shape.setOrigin(shape.getSize().x, 0.f);
         }
         else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             moveDirection = 1;
+            isFacingRight = true;
+            shape.setScale(1.f, 1.f);
+            shape.setOrigin(0.f, 0.f);
         }
         // Giữ nguyên moveDirection nếu không bấm phím nào
     }
@@ -56,6 +98,7 @@ void Player::handleInput() {
         if (isGrounded && !isChargingJump) {
             isChargingJump = true;
             jumpCharge = 0.f;
+            shape.setTexture(&chargeTexture);
             // Mặc định hướng hiện tại khi bắt đầu tích lực
             moveDirection = (velocity.x < 0) ? -1 : (velocity.x > 0) ? 1 : 0;
         }
@@ -87,6 +130,7 @@ void Player::handleInput() {
         isChargingJump = false;
         jumpCharge = 0.f;
         isJumping = true; // Cờ đang nhảy
+        shape.setTexture(&jumpTexture);
     }
 
     // Khi đang bay thì KHÔNG THỂ thay đổi hướng
@@ -103,7 +147,7 @@ void Player::handleInput() {
 
 void Player::update(float deltaTime) {
     // Áp dụng trọng lực
-    velocity.y += gravity;
+    velocity.y += gravity * deltaTime;
     
     // Lấy danh sách các tile va chạm từ map
     auto solidTiles = gameMap.getSolidTiles();
@@ -112,7 +156,7 @@ void Player::update(float deltaTime) {
     // Xử lý di chuyển ngang (trục X)
     sf::Vector2f newPosition = shape.getPosition();
     if (!isChargingJump) {
-        newPosition.x += velocity.x;
+        newPosition.x += velocity.x * deltaTime;
     }
     sf::FloatRect nextPlayerBoundsX(newPosition.x, playerBounds.top, playerBounds.width, playerBounds.height);
 
@@ -125,12 +169,12 @@ void Player::update(float deltaTime) {
             float platformRight = platformBounds.left + platformBounds.width;
             
             // Va chạm từ bên trái platform
-            if (velocity.x > 0 && playerRight - velocity.x <= platformBounds.left + COLLISION_THRESHOLD) {
+            if (velocity.x > 0 && playerRight - velocity.x * deltaTime <= platformBounds.left + COLLISION_THRESHOLD) {
                 newPosition.x = platformBounds.left - playerBounds.width;
                 velocity.x = -velocity.x * 0.8f; // Bật ngược lại với hệ số giảm
             }
             // Va chạm từ bên phải platform
-            else if (velocity.x < 0 && playerBounds.left - velocity.x >= platformRight - COLLISION_THRESHOLD) {
+            else if (velocity.x < 0 && playerBounds.left - velocity.x * deltaTime >= platformRight - COLLISION_THRESHOLD) {
                 newPosition.x = platformBounds.left + platformBounds.width;
                 velocity.x = -velocity.x * 0.8f; // Bật ngược lại với hệ số giảm
             }
@@ -142,8 +186,7 @@ void Player::update(float deltaTime) {
     playerBounds = shape.getGlobalBounds();
 
     // Xử lý di chuyển dọc (trục Y)
-    float displacementY = velocity.y;
-    newPosition.y += displacementY;
+    newPosition.y += velocity.y * deltaTime;
     isGrounded = false;
 
     // Kiểm tra va chạm dọc
@@ -159,7 +202,7 @@ void Player::update(float deltaTime) {
 
             if (velocity.y >= 0) { // Rơi xuống
                 // Kiểm tra xem player có vượt qua đỉnh platform không
-                if (playerBottom <= platformTop && playerBottom + displacementY >= platformTop) {
+                if (playerBottom <= platformTop && playerBottom + velocity.y * deltaTime >= platformTop) {
                     // Đặt player ngay trên đỉnh platform
                     newPosition.y = platformTop - playerBounds.height;
                     velocity.y = 0.f;
@@ -167,7 +210,7 @@ void Player::update(float deltaTime) {
                 }
             } else if (velocity.y < 0) { // Nhảy lên
                 // Kiểm tra va chạm với đáy platform
-                if (playerTop >= platformBottom && playerTop + displacementY <= platformBottom) {
+                if (playerTop >= platformBottom && playerTop + velocity.y * deltaTime <= platformBottom) {
                     newPosition.y = platformBottom;
                     velocity.y = 0.5f; // Bật nhẹ xuống dưới
                 }
@@ -195,8 +238,6 @@ void Player::update(float deltaTime) {
 void Player::draw(sf::RenderWindow& window) {
     window.draw(shape);
     if (isChargingJump) {
-        // window.draw(jumpChargeBarBorder);
-        // window.draw(jumpChargeBar);
         sf::View originalView = window.getView(); // Save current view
         window.setView(window.getDefaultView());  // Switch to default view
         window.draw(jumpChargeBarBorder);
