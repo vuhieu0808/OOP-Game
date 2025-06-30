@@ -11,6 +11,7 @@ private:
     sf::Vector2f tileSize;          // Kích thước mỗi tile
     std::vector<sf::Sprite> tiles;  // Thay đổi từ RectangleShape sang Sprite
     sf::Vector2f playerStartPos;    // Vị trí bắt đầu của player
+    std::vector<sf::FloatRect> solids;
 
     std::unordered_map<char, sf::Texture> tileTextures; // Map texture cho từng loại tile
 

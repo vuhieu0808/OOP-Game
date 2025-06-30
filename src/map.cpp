@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 
-Map::Map() : tileSize(12.f, 12.f) {
+Map::Map() : tileSize(18.f, 18.f) {
     // Không cần thiết lập màu mặc định nữa
 }
 
@@ -51,10 +51,14 @@ bool Map::loadFromFile(const std::string& filename) {
         std::string path = "media/tile/" + std::string(1, c) + ".png";
         loadTexture(c, path);
     }
-    for (char c = 'a'; c <= 'e'; c++) {
+    for (char c = 'a'; c <= 'z'; c++) {
         std::string path = "media/tile/" + std::string(1, c) + ".png";
         loadTexture(c, path);
     }
+    // for (char c : {'!', '@'}) {
+    //     std::string path = "media/tile/" + std::string(1, c) + ".png";
+    //     loadTexture(c, path);
+    // }
 
     // Tạo các sprite từ grid
     for (int row = 0; row < grid.size(); ++row) {
@@ -72,6 +76,7 @@ bool Map::loadFromFile(const std::string& filename) {
                 );
                 
                 tiles.push_back(tileSprite);
+                solids.push_back(tileSprite.getGlobalBounds());
             }
         }
     }
@@ -98,10 +103,6 @@ sf::Vector2f Map::getMapSize() const {
 }
 
 std::vector<sf::FloatRect> Map::getSolidTiles() const {
-    std::vector<sf::FloatRect> solids;
-    for (const auto& tile : tiles) {
-        solids.push_back(tile.getGlobalBounds());
-    }
     return solids;
 }
 

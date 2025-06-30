@@ -4,6 +4,7 @@
 #include "map.h"
 #include "camera.h"
 #include "player.h"
+#include "menu.h"
 
 const int WINDOW_WIDTH = 1920;
 const int WINDOW_HEIGHT = 1080;
@@ -16,9 +17,11 @@ private:
     sf::Clock clock;
     Map gameMap;
     Player player;
-    Camera camera;  // Thêm camera
+    Camera camera;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
+
+    Menu menu;
 
 public:
     Game();
