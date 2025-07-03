@@ -3,7 +3,7 @@
 
 Game::Game() : 
     window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Vuhieu King"),
-    camera(sf::Vector2f(720, 720)),
+    camera(sf::Vector2f(576, 270)),
     player(sf::Vector2f(100.f, 100.f), camera, gameMap),
     menu(window)  // Khởi tạo menu
 {

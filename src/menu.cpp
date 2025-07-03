@@ -19,7 +19,8 @@ Menu::Menu(sf::RenderWindow& window) : window(window), currentState(MenuState::S
     setupStartMenu();
     
     // Available maps
-    mapFiles = {"level1.map", "level2.map", "level3.map"};
+    mapFiles = {"media/map/map2.tmx"};
+    // mapFiles = {"level1.map"};
 }
 
 void Menu::setupStartMenu() {

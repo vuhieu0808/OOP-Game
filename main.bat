@@ -3,8 +3,8 @@ echo =============================
 echo 🚀 BUILDING THE SFML GAME...
 echo =============================
 
-:: Compile the C++ source code
-g++ -Iinclude -Llib -o bin\main.exe main.cpp src\*.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+:: Compile the C++ source code with tinyxml2
+g++ -Iinclude -Iinclude/tinyxml2 -Llib -o bin\main.exe main.cpp src\*.cpp include/tinyxml2/tinyxml2.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 :: Kiểm tra lỗi biên dịch
 if %ERRORLEVEL% NEQ 0 (

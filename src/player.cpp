@@ -10,7 +10,7 @@ Player::Player(sf::Vector2f position, Camera& cam, const Map& gameMap) :
     gameMap(gameMap)
 {
     // Thiết lập hình dạng nhân vật
-    shape.setSize(sf::Vector2f(32.f, 32.f));
+    shape.setSize(sf::Vector2f(20.f, 20.f));
     shape.setPosition(position);
     velocity = sf::Vector2f(0.f, 0.f);
 
@@ -216,6 +216,12 @@ void Player::update(float deltaTime) {
                 }
             }
         }
+    }
+
+    auto mapSize = gameMap.getMapSize();
+
+    if (newPosition.y > mapSize.y) {
+        newPosition.y = gameMap.getPlayerStartPos().y;
     }
 
     // Cập nhật vị trí cuối cùng
