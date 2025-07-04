@@ -16,6 +16,7 @@ private:
     std::vector<sf::Sprite> backgroundFrontTiles;       // Tiles cho layer background_front
     std::vector<sf::Sprite> mapTiles;                  // Tiles cho layer map
     sf::Vector2f playerStartPos;                        // Vị trí bắt đầu của player
+    sf::Vector2f playerEndPos;                          // Vị trí kết thúc của player
     std::vector<sf::FloatRect> solids;                 // Các tile có va chạm
     std::unordered_map<int, sf::Texture> tileTextures;  // Map texture cho từng tile ID
 
@@ -29,6 +30,7 @@ public:
     bool loadFromFile(const std::string& filename);
     void draw(sf::RenderWindow& window);
     sf::Vector2f getPlayerStartPos() const;
+    sf::Vector2f getPlayerEndPos() const;
     sf::Vector2f getMapSize() const;
     std::vector<sf::FloatRect> getSolidTiles() const;
     std::vector<sf::FloatRect> getNearbyTiles(const sf::FloatRect& area) const;

@@ -57,4 +57,6 @@ public:
     sf::FloatRect getGlobalBounds() const;
     sf::RectangleShape getJumpChargeBar() const;
     sf::RectangleShape getJumpChargeBarBorder() const;
+
+    bool checkWinCondition(const Map& gameMap) const;
 };

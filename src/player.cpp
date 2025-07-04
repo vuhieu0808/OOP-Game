@@ -271,3 +271,11 @@ sf::RectangleShape Player::getJumpChargeBar() const {
 sf::RectangleShape Player::getJumpChargeBarBorder() const {
     return jumpChargeBarBorder;
 }
+
+bool Player::checkWinCondition(const Map& gameMap) const {
+    sf::FloatRect playerBounds = shape.getGlobalBounds();
+    sf::Vector2f endPos = gameMap.getPlayerEndPos();
+    sf::Vector2f tileSize = gameMap.getTileSize();
+    sf::FloatRect endArea(endPos.x, endPos.y, tileSize.x, tileSize.y); // Giả sử vùng kết thúc có kích thước 1 tile
+    return playerBounds.intersects(endArea);
+}

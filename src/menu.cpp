@@ -117,6 +117,31 @@ void Menu::setupPauseMenu() {
     }
 }
 
+void Menu::setupWinMenu() {
+    titleText.setString("VICTORY!");
+    titleText.setFont(font);
+    titleText.setCharacterSize(80);
+    titleText.setFillColor(sf::Color::Green);
+    titleText.setStyle(sf::Text::Bold);
+    titleText.setPosition(
+        window.getSize().x / 2 - titleText.getGlobalBounds().width / 2,
+        100
+    );
+    
+    winMenuItems.clear();
+    
+    sf::Text backText;
+    backText.setString("Back to Menu");
+    backText.setFont(font);
+    backText.setCharacterSize(50);
+    backText.setFillColor(sf::Color::White);
+    backText.setPosition(
+        window.getSize().x / 2 - backText.getGlobalBounds().width / 2,
+        300
+    );
+    winMenuItems.push_back(backText);
+}
+
 void Menu::update() {
     if (currentState == MenuState::Start) {
         handleStartMenuInput();
@@ -124,8 +149,11 @@ void Menu::update() {
     else if (currentState == MenuState::Settings) {
         handleSettingsMenuInput();
     }
-    else if (currentState == MenuState::Pause) {  // Thêm xử lý Pause
+    else if (currentState == MenuState::Pause) { 
         handlePauseMenuInput();
+    }
+    else if (currentState == MenuState::Win) {
+        handleWinMenuInput();
     }
 }
 
@@ -309,6 +337,14 @@ void Menu::handlePauseMenuInput() {
     }
 }
 
+void Menu::handleWinMenuInput() {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) {
+        currentState = MenuState::Start;
+        setupStartMenu();
+        sf::sleep(sf::milliseconds(200));
+    }
+}
+
 void Menu::render() {
     // Chỉ clear window và vẽ background nếu không phải là pause menu
     if (currentState != MenuState::Pause) {
@@ -341,6 +377,11 @@ void Menu::render() {
             window.draw(item);
         }
     }
+    else if (currentState == MenuState::Win) {
+        for (const auto& item : winMenuItems) {
+            window.draw(item);
+        }
+    }
     
     // Chỉ display nếu không phải là pause menu
     // (pause menu sẽ được display bởi Game::run())
@@ -365,7 +406,10 @@ void Menu::setState(MenuState state) {
     else if (state == MenuState::Settings) {
         setupSettingsMenu();
     }
-    else if (state == MenuState::Pause) {  // Thêm dòng này
+    else if (state == MenuState::Pause) { 
         setupPauseMenu();
+    }
+    else if (state == MenuState::Win) {
+        setupWinMenu();
     }
 }

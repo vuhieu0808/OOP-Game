@@ -86,6 +86,31 @@ void Game::run() {
         player.update(deltaTime);
         camera.update(player.getPosition());
 
+        if (player.checkWinCondition(gameMap)) {
+            menu.setState(MenuState::Win);
+            // Vẽ game trước
+            window.clear();
+            
+            // Vẽ background
+            sf::View defaultView = window.getDefaultView();
+            window.setView(defaultView);
+            window.draw(backgroundSprite);
+            
+            // Vẽ game world
+            camera.applyTo(window);
+            gameMap.draw(window);
+            player.draw(window);
+
+            menu.update();
+            
+            // Rồi mới vẽ menu pause lên trên
+            window.setView(defaultView);
+            menu.render();
+            
+            window.display();
+            continue;
+        }
+
         // Render game
         window.clear();
         

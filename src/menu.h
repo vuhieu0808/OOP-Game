@@ -7,7 +7,8 @@ enum class MenuState {
     Start,
     Settings,
     Playing,
-    Pause
+    Pause,
+    Win
 };
 
 class Menu {
@@ -21,6 +22,7 @@ private:
     std::vector<sf::Text> startMenuItems;
     std::vector<sf::Text> settingsMenuItems;
     std::vector<sf::Text> pauseMenuItems;
+    std::vector<sf::Text> winMenuItems;
     
     // Background
     sf::Texture backgroundTexture;
@@ -33,9 +35,11 @@ private:
     void setupStartMenu();
     void setupSettingsMenu();
     void setupPauseMenu();
+    void setupWinMenu();
     void handleStartMenuInput();
     void handleSettingsMenuInput();
     void handlePauseMenuInput();
+    void handleWinMenuInput();
 
 public:
     Menu(sf::RenderWindow& window);

@@ -104,11 +104,16 @@ bool Map::loadLayer(tinyxml2::XMLElement* layerElement, std::vector<std::vector<
 bool Map::loadObjectLayer(tinyxml2::XMLElement* objectGroupElement) {
     tinyxml2::XMLElement* objectElement = objectGroupElement->FirstChildElement("object");
     while (objectElement) {
-        if (std::string(objectElement->Attribute("name")) == "player_start") {
+        std::string name = objectElement->Attribute("name");
+        if (name == "player_start") {
             playerStartPos.x = objectElement->FloatAttribute("x");
             playerStartPos.y = objectElement->FloatAttribute("y");
             std::cout << "Found player start position: (" << playerStartPos.x << "," << playerStartPos.y << ")" << std::endl;
-            break;
+        }
+        else if (name == "player_end") {
+            playerEndPos.x = objectElement->FloatAttribute("x");
+            playerEndPos.y = objectElement->FloatAttribute("y");
+            std::cout << "Found player end position: (" << playerEndPos.x << "," << playerEndPos.y << ")" << std::endl;
         }
         objectElement = objectElement->NextSiblingElement("object");
     }
@@ -220,6 +225,10 @@ void Map::draw(sf::RenderWindow& window) {
 
 sf::Vector2f Map::getPlayerStartPos() const {
     return playerStartPos;
+}
+
+sf::Vector2f Map::getPlayerEndPos() const {
+    return playerEndPos;
 }
 
 sf::Vector2f Map::getMapSize() const {
