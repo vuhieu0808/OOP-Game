@@ -31,10 +31,10 @@ private:
     // Các hằng số vật lý
     const float gravity = 0.5f * 2000;
     const float baseJumpStrength = -2.f * 20;
-    const float maxJumpStrength = -20.f * 50;
+    const float maxJumpStrength = -15.f * 50;
     const float chargeRate = 0.01667f * 100;
     const float maxCharge = 1.5f * 100;
-    const float moveSpeed = 3.f * 50;
+    const float moveSpeed = 2.f * 50;
     const float jumpHorizontalFactor = 0.7f;
     const float COLLISION_THRESHOLD = 5.0f;
 

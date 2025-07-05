@@ -4,7 +4,7 @@
 #include <sstream>
 #include <tinyxml2.h>
 
-Map::Map() : tileSize(18.f, 18.f) { // Đặt tileSize thành 16x16 dựa trên tileset
+Map::Map() : tileSize(18.f, 18.f) { 
 }
 
 bool Map::loadTexture(const std::string& filename, int tileId) {
@@ -36,9 +36,14 @@ bool Map::loadTileset(tinyxml2::XMLElement* tilesetElement, const std::string& t
     // Điều chỉnh đường dẫn dựa trên tên tileset
     if (source.find("tileset-tiles.tsx") != std::string::npos) {
         imagePath = "media/map/Tilemap/tilemap_packed.png"; // Đường dẫn mới cho tileset-tiles.tsx
-    } else if (source.find("tileset-characters.tsx") != std::string::npos) {
+    } 
+    else if (source.find("tileset-characters.tsx") != std::string::npos) {
         imagePath = "media/map/Tilemap/tilemap-characters_packed.png"; // Đường dẫn mới cho tileset-characters.tsx
-    } else {
+    } 
+    else if (source.find("tileset-background.tsx") != std::string::npos) {
+        imagePath = "media/map/Tilemap/tilemap-backgrounds_packed.png";
+    }
+    else {
         std::cerr << "Unknown tileset source: " << source << std::endl;
         return false;
     }
