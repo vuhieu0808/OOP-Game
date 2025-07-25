@@ -2,15 +2,16 @@
 #include <SFML/Graphics.hpp>
 #include "camera.h"
 #include "map.h"
+#include "gameObject.h"
 
-class Player {
+class Player : public GameObject {
 private:
     Camera& camera;
     const Map& gameMap;
 
     // Hình dạng và thuộc tính nhân vật
-    sf::RectangleShape shape;
-    sf::Vector2f velocity;
+    // sf::RectangleShape shape;
+    // sf::Vector2f velocity;
     
     // Texture system
     sf::Texture idleTexture;
@@ -48,13 +49,13 @@ public:
         const std::string& chargeTex
     );
     
-    void update(float deltaTime);
+    void update(float deltaTime) override;
     void handleInput();
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window) override;
     
-    const sf::Vector2f& getPosition() const;
-    void setPosition(sf::Vector2f position);
-    sf::FloatRect getGlobalBounds() const;
+    // const sf::Vector2f& getPosition() const;
+    // void setPosition(sf::Vector2f position);
+    // sf::FloatRect getGlobalBounds() const override;
     sf::RectangleShape getJumpChargeBar() const;
     sf::RectangleShape getJumpChargeBarBorder() const;
 

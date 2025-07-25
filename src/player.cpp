@@ -3,6 +3,7 @@
 #include <iostream>
 
 Player::Player(sf::Vector2f position, Camera& cam, const Map& gameMap) : 
+    GameObject(position),
     camera(cam),
     isGrounded(false),
     jumpCharge(0.f),
@@ -252,17 +253,17 @@ void Player::draw(sf::RenderWindow& window) {
     }
 }
 
-const sf::Vector2f& Player::getPosition() const {
-    return shape.getPosition();
-}
+// const sf::Vector2f& Player::getPosition() const {
+//     return shape.getPosition();
+// }
 
-void Player::setPosition(sf::Vector2f position) {
-    shape.setPosition(position);
-}
+// void Player::setPosition(sf::Vector2f position) {
+//     shape.setPosition(position);
+// }
 
-sf::FloatRect Player::getGlobalBounds() const {
-    return shape.getGlobalBounds();
-}
+// sf::FloatRect Player::getGlobalBounds() const {
+//     return shape.getGlobalBounds();
+// }
 
 sf::RectangleShape Player::getJumpChargeBar() const {
     return jumpChargeBar;
