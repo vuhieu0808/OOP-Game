@@ -19,6 +19,9 @@ Game::Game() :
 }
 
 void Game::run() {
+    addObserver(&menu);  // Đăng ký menu làm observer
+    menu.setState(MenuState::Start);  // Bắt đầu ở menu chính
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -125,5 +128,22 @@ void Game::run() {
         player.draw(window);
         
         window.display();
+    }
+}
+
+void Game::addObserver(IGameObserver* observer) {
+    observers.push_back(observer);
+}
+
+void Game::removeObserver(IGameObserver* observer) {
+    auto it = std::find(observers.begin(), observers.end(), observer);
+    if (it != observers.end()) {
+        observers.erase(it);
+    }
+}
+
+void Game::notifyObservers(GameEvent event) {
+    for (auto observer : observers) {
+        observer->onGameEvent(event);
     }
 }

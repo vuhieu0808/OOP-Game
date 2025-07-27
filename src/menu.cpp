@@ -413,3 +413,23 @@ void Menu::setState(MenuState state) {
         setupWinMenu();
     }
 }
+
+void Menu::onGameEvent(GameEvent event) {
+    switch (event) {
+        case GameEvent::PlayerWin:
+            setState(MenuState::Win);
+            break;
+        case GameEvent::GamePaused:
+            if (getCurrentState() == MenuState::Playing) {
+                setState(MenuState::Pause);
+            }
+            break;
+        case GameEvent::GameResumed:
+            if (getCurrentState() == MenuState::Pause) {
+                setState(MenuState::Playing);
+            }
+            break;
+        default:
+            break;
+    }
+}

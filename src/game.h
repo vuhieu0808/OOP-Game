@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "player.h"
 #include "menu.h"
+#include "gameObserver.h"
 
 const int WINDOW_WIDTH = 1920;
 const int WINDOW_HEIGHT = 1080;
@@ -23,7 +24,13 @@ private:
 
     Menu menu;
 
+    std::vector<IGameObserver*> observers;
+
 public:
     Game();
     void run();
+
+    void addObserver(IGameObserver* observer);
+    void removeObserver(IGameObserver* observer);
+    void notifyObservers(GameEvent event);
 };

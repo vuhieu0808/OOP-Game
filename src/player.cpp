@@ -26,7 +26,7 @@ Player::Player(sf::Vector2f position, Camera& cam, const Map& gameMap) :
 bool Player::loadTextures(
     const std::string& idleTex = "media/player/idle.png",
     const std::string& walkTex = "media/player/walk.png",
-    const std::string& jumpTex = "media/player/walk.png",
+    const std::string& jumpTex = "media/player/jump.png",
     const std::string& chargeTex = "media/player/charge.png"
 ) {
     if (!idleTexture.loadFromFile(idleTex) ||
@@ -147,6 +147,7 @@ void Player::handleInput() {
 }
 
 void Player::update(float deltaTime) {
+    std::cout << deltaTime << '\n';
     // Áp dụng trọng lực
     velocity.y += gravity * deltaTime;
     
@@ -227,7 +228,6 @@ void Player::update(float deltaTime) {
 
     // Cập nhật vị trí cuối cùng
     shape.setPosition(newPosition);
-    // std::cerr << newPosition.x << ' ' << newPosition.y << '\n';
 
     // Cập nhật thanh tích lực
     if (isChargingJump) {
@@ -252,18 +252,6 @@ void Player::draw(sf::RenderWindow& window) {
         window.setView(originalView); // Restore original view
     }
 }
-
-// const sf::Vector2f& Player::getPosition() const {
-//     return shape.getPosition();
-// }
-
-// void Player::setPosition(sf::Vector2f position) {
-//     shape.setPosition(position);
-// }
-
-// sf::FloatRect Player::getGlobalBounds() const {
-//     return shape.getGlobalBounds();
-// }
 
 sf::RectangleShape Player::getJumpChargeBar() const {
     return jumpChargeBar;

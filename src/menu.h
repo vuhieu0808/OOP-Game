@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gameObserver.h"
+
 #include <SFML/Graphics.hpp>
 #include <vector>
 
@@ -11,7 +13,7 @@ enum class MenuState {
     Win
 };
 
-class Menu {
+class Menu : public IGameObserver {
 private:
     sf::RenderWindow& window;
     MenuState currentState;
@@ -48,4 +50,6 @@ public:
     MenuState getCurrentState() const;
     std::string getSelectedMap() const;
     void setState(MenuState state);
+
+    void onGameEvent(GameEvent event) override;
 };

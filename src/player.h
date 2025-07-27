@@ -9,10 +9,6 @@ private:
     Camera& camera;
     const Map& gameMap;
 
-    // Hình dạng và thuộc tính nhân vật
-    // sf::RectangleShape shape;
-    // sf::Vector2f velocity;
-    
     // Texture system
     sf::Texture idleTexture;
     sf::Texture walkTexture;
@@ -53,9 +49,6 @@ public:
     void handleInput();
     void draw(sf::RenderWindow& window) override;
     
-    // const sf::Vector2f& getPosition() const;
-    // void setPosition(sf::Vector2f position);
-    // sf::FloatRect getGlobalBounds() const override;
     sf::RectangleShape getJumpChargeBar() const;
     sf::RectangleShape getJumpChargeBarBorder() const;
 
