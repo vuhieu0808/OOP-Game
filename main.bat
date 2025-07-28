@@ -4,7 +4,7 @@ echo 🚀 BUILDING THE SFML GAME...
 echo =============================
 
 :: Compile the C++ source code with tinyxml2
-g++ -Iinclude -Iinclude/tinyxml2 -Llib -o bin\main.exe main.cpp src2\*.cpp include/tinyxml2/tinyxml2.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+g++ -Iinclude -Iinclude/tinyxml2 -Llib -o bin\main.exe main.cpp src2\*.cpp src2\menu\*.cpp src2\menu\commands\*.cpp src2\menu\states\*.cpp include/tinyxml2/tinyxml2.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 
 :: Kiểm tra lỗi biên dịch
 if %ERRORLEVEL% NEQ 0 (

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="40" height="75" tilewidth="18" tileheight="18" infinite="0" nextlayerid="3" nextobjectid="2">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="40" height="75" tilewidth="18" tileheight="18" infinite="0" nextlayerid="3" nextobjectid="4">
  <tileset firstgid="1" source="Tiled/tileset-tiles.tsx"/>
  <layer id="1" name="map" width="40" height="75">
   <data encoding="csv">
@@ -82,6 +82,9 @@
  </layer>
  <objectgroup id="2" name="object">
   <object id="1" name="player_start" x="345" y="1277">
+   <point/>
+  </object>
+  <object id="2" name="player_end" x="661" y="1325">
    <point/>
   </object>
  </objectgroup>

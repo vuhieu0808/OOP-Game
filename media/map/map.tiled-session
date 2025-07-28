@@ -3,9 +3,10 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "map2.tmx",
+    "activeFile": "map1.tmx",
     "expandedProjectPaths": [
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "D:/Hieu/university/1st_year/HK3/OOP/LT/project/media/kenney_pixel-platformer/Tiled/tileset-tiles.tsx": {
             "scaleInDock": 1,
@@ -40,7 +41,7 @@
         },
         "map1.tmx": {
             "scale": 1,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 337.5,
                 "y": 1226.5
@@ -70,16 +71,15 @@
     "map.tileWidth": 18,
     "map.width": 32,
     "openFiles": [
-        "map.tmx",
-        "map2.tmx"
+        "map1.tmx"
     ],
     "project": "map.tiled-project",
     "recentFiles": [
+        "map1.tmx",
         "map.tmx",
         "map2.tmx",
         "Tiled/tilemap-example-a.tmx",
         "Tiled/tileset-background.tsx",
-        "map1.tmx",
         "Tiled/tileset-tiles.tsx",
         "D:/Hieu/university/1st_year/HK3/OOP/LT/project/media/kenney_pixel-platformer/Tiled/tileset-tiles.tsx",
         "tileset-tiles.tsx"

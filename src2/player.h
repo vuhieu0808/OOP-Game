@@ -78,6 +78,8 @@ public:
     bool getIsFacingRight() const;
     void increaseJumpCharge();
     void jump();
+
+    bool checkWinCondition() const;
 };
 
 #endif // PLAYER_H

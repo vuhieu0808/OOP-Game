@@ -196,3 +196,11 @@ void Player::update(float deltaTime) {
         jumpChargeBar.setSize(sf::Vector2f(10.f, 0.f));
     }
 }
+
+bool Player::checkWinCondition() const {
+    sf::FloatRect playerBounds = shape.getGlobalBounds();
+    sf::Vector2f endPos = gameMap.getPlayerEndPos();
+    sf::Vector2f tileSize = gameMap.getTileSize();
+    sf::FloatRect endArea(endPos.x, endPos.y, tileSize.x, tileSize.y); // Giả sử vùng kết thúc có kích thước 1 tile
+    return playerBounds.intersects(endArea);
+}
