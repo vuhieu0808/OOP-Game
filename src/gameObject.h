@@ -5,20 +5,25 @@
 
 class GameObject {
 protected:
-    sf::Vector2f velocity;
-    sf::RectangleShape shape;
-    
+    sf::Sprite shape;
+    sf::Texture texture;
+    sf::Vector2f size;
+
 public:
-    GameObject(const sf::Vector2f& pos);
-    virtual ~GameObject() = default;
-    
-    virtual void update(float deltaTime) = 0;
-    virtual void draw(sf::RenderWindow& window) = 0;
-    virtual sf::FloatRect getGlobalBounds() const;
-    
+    GameObject(const std::string& textureFile);
+    virtual void draw(sf::RenderWindow& window);
+
+    // Setters
+    void setPosition(const sf::Vector2f& position);
+    void setSize(const sf::Vector2f& newSize);
+    void setTexture(const sf::Texture& newTexture);
+    void setScale(float scaleX, float scaleY);
+    void setOrigin(float originX, float originY);
+
+    // Getters
+    sf::FloatRect getGlobalBounds() const;
     const sf::Vector2f& getPosition() const;
-    void setPosition(const sf::Vector2f& pos);
+    const sf::Vector2f& getSize() const;
 };
 
-
-#endif
+#endif // GAME_OBJECT_H

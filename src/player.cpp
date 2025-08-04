@@ -1,19 +1,22 @@
 #include "player.h"
-#include "game.h"
+#include "inputHandler.h"
 #include <iostream>
 
-Player::Player(sf::Vector2f position, Camera& cam, const Map& gameMap) : 
-    GameObject(position),
-    camera(cam),
-    isGrounded(false),
-    jumpCharge(0.f),
-    isChargingJump(false),
-    gameMap(gameMap)
+Player::Player(const std::string& textureFile, const Map& map) : 
+    GameObject(textureFile), 
+    currentState(PlayerState::Idle),
+    gameMap(map) 
 {
     // Thiết lập hình dạng nhân vật
-    shape.setSize(sf::Vector2f(20.f, 20.f));
-    shape.setPosition(position);
+    this->setSize(sf::Vector2f(32.f, 32.f));
+    this->setPosition(sf::Vector2f(100.f, 100.f)); // Vị trí khởi tạo
     velocity = sf::Vector2f(0.f, 0.f);
+    
+    jumpCharge = 0.f;
+    isChargingJump = false;
+    moveDirection = 0;
+    isJumping = false;
+    isFacingRight = true; // Ban đầu hướng nhìn sang phải
 
     // Thiết lập thanh tích lực nhảy
     jumpChargeBar.setSize(sf::Vector2f(10.f, 0.f));
@@ -23,131 +26,84 @@ Player::Player(sf::Vector2f position, Camera& cam, const Map& gameMap) :
     jumpChargeBarBorder.setFillColor(sf::Color::Black);
 }
 
-bool Player::loadTextures(
-    const std::string& idleTex = "media/player/idle.png",
-    const std::string& walkTex = "media/player/walk.png",
-    const std::string& jumpTex = "media/player/jump.png",
-    const std::string& chargeTex = "media/player/charge.png"
-) {
-    if (!idleTexture.loadFromFile(idleTex) ||
-        !walkTexture.loadFromFile(walkTex) ||
-        !jumpTexture.loadFromFile(jumpTex) ||
-        !chargeTexture.loadFromFile(chargeTex)) {
-        return false;
+// Setters
+void Player::setVelocityX(float vx) { velocity.x = vx; }
+void Player::setVelocityY(float vy) { velocity.y = vy; }
+void Player::setMoveDirection(int direction) { moveDirection = direction; }
+void Player::startCharging() { isChargingJump = true; jumpCharge = 0.f; }
+void Player::stopCharging() { isChargingJump = false; }
+void Player::setGrounded(bool grounded) { isGround = grounded; }
+void Player::setJumping(bool jumping) { isJumping = jumping; }
+void Player::setFacingRight(bool facingRight) { isFacingRight = facingRight; }
+
+// Getters
+float Player::getMoveSpeed() const { return moveSpeed; }
+float Player::getBaseJumpStrength() const { return baseJumpStrength; }
+int Player::getMoveDirection() const { return moveDirection; }
+bool Player::isGrounded() const { return isGround; }
+bool Player::isCharging() const { return isChargingJump; }
+float Player::calculateJumpStrength() const {
+    return baseJumpStrength + (maxJumpStrength - baseJumpStrength) * (jumpCharge / maxCharge);
+}
+bool Player::getIsFacingRight() const { return isFacingRight; }
+
+void Player::increaseJumpCharge() {
+    jumpCharge += chargeRate;
+    if (jumpCharge > maxCharge) {
+        jumpCharge = maxCharge;
     }
+}
+
+void Player::jump() {
+    float jumpPower = calculateJumpStrength();
+    isGround = false;
+    isJumping = true; // Cờ đang nhảy
+    isChargingJump = false; // Kết thúc tích lũy nhảy
+    jumpCharge = 0.f; // Reset tích lũy nhảy
     
-    // Mặc định texture idle ban đầu
-    shape.setTexture(&idleTexture);
-    return true;
+    if (moveDirection == -1) { // Nhảy trái lên
+        velocity.x = -moveSpeed * jumpHorizontalFactor;
+    } 
+    else if (moveDirection == 1) { // Nhảy phải lên
+        velocity.x = moveSpeed * jumpHorizontalFactor;
+    } 
+    else { // Nhảy thẳng lên
+        velocity.x = 0.f;
+    }
+    velocity.y = jumpPower;
+}
+
+void Player::draw(sf::RenderWindow& window) {
+    GameObject::draw(window);
+    if (isChargingJump) {
+        sf::View originalView = window.getView(); // Save current view
+        window.setView(window.getDefaultView());  // Switch to default view
+        window.draw(jumpChargeBarBorder);
+        window.draw(jumpChargeBar);
+        window.setView(originalView); // Restore original view
+    }
+}
+
+std::string Player::stateToString(PlayerState state) const {
+    switch (state) {
+        case PlayerState::Idle:         return "Idle";
+        case PlayerState::Walking:      return "Walking";
+        case PlayerState::Jumping:      return "Jumping";
+        case PlayerState::ChargingJump: return "ChargingJump";
+        default:                        return "Unknown";
+    }
+}
+
+void Player::changeState(PlayerState newState) {
+    currentState = newState;
+    notify(stateToString(currentState));
 }
 
 void Player::handleInput() {
-    // Xử lý di chuyển thông thường khi không tích lực
-    if (!isChargingJump && isGrounded) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            velocity.x = -moveSpeed;
-            moveDirection = -1; // Lưu hướng trái
-            isFacingRight = false;
-            shape.setTexture(&walkTexture);
-            shape.setScale(-1.f, 1.f);
-            shape.setOrigin(shape.getSize().x, 0.f);
-        } 
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            velocity.x = moveSpeed;
-            moveDirection = 1; // Lưu hướng phải
-            isFacingRight = true;
-            shape.setTexture(&walkTexture);
-            shape.setScale(1.f, 1.f);
-            shape.setOrigin(0.f, 0.f);
-        }
-        else {
-            velocity.x = 0.f;
-            moveDirection = 0; // Không di chuyển ngang
-            if (isGrounded) {
-                shape.setTexture(&idleTexture);
-                if (!isFacingRight) {
-                    shape.setScale(-1.f, 1.f);
-                    shape.setOrigin(shape.getSize().x, 0.f);
-                } 
-                else {
-                    shape.setScale(1.f, 1.f);
-                    shape.setOrigin(0.f, 0.f);
-                }
-            }
-        }
-    }
-
-    // Khi đang tích lực thì chỉ lưu hướng, không di chuyển
-    if (isChargingJump && isGrounded) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            moveDirection = -1;
-            isFacingRight = false;
-            shape.setScale(-1.f, 1.f);
-            shape.setOrigin(shape.getSize().x, 0.f);
-        }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            moveDirection = 1;
-            isFacingRight = true;
-            shape.setScale(1.f, 1.f);
-            shape.setOrigin(0.f, 0.f);
-        }
-        // Giữ nguyên moveDirection nếu không bấm phím nào
-    }
-
-    // Xử lý nhảy
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
-        if (isGrounded && !isChargingJump) {
-            isChargingJump = true;
-            jumpCharge = 0.f;
-            shape.setTexture(&chargeTexture);
-            // Mặc định hướng hiện tại khi bắt đầu tích lực
-            moveDirection = (velocity.x < 0) ? -1 : (velocity.x > 0) ? 1 : 0;
-        }
-
-        if (isChargingJump && isGrounded) {
-            jumpCharge += chargeRate;
-            jumpCharge = std::min(jumpCharge, maxCharge);
-        }
-    }
-    else if (isChargingJump && isGrounded) {
-        // Thực hiện nhảy với hướng đã khóa
-        float jumpPower = baseJumpStrength + (maxJumpStrength - baseJumpStrength) * (jumpCharge / maxCharge);
-        
-        // Vector nhảy cố định theo hướng đã chọn
-        if (moveDirection == -1) { // Nhảy trái lên
-            velocity.x = -moveSpeed * jumpHorizontalFactor;
-            velocity.y = jumpPower;
-        }
-        else if (moveDirection == 1) { // Nhảy phải lên
-            velocity.x = moveSpeed * jumpHorizontalFactor;
-            velocity.y = jumpPower;
-        }
-        else { // Nhảy thẳng lên
-            velocity.x = 0.f;
-            velocity.y = jumpPower;
-        }
-
-        isGrounded = false;
-        isChargingJump = false;
-        jumpCharge = 0.f;
-        isJumping = true; // Cờ đang nhảy
-        shape.setTexture(&jumpTexture);
-    }
-
-    // Khi đang bay thì KHÔNG THỂ thay đổi hướng
-    if (isJumping && !isGrounded) {
-        // Vô hiệu hóa input trái/phải
-        // Giữ nguyên velocity.x đã được set khi nhảy
-    }
-
-    // Reset khi chạm đất
-    if (isGrounded) {
-        isJumping = false;
-    }
+    InputHandler::getInstance().handleInput(*this);
 }
 
 void Player::update(float deltaTime) {
-    std::cout << deltaTime << '\n';
     // Áp dụng trọng lực
     velocity.y += gravity * deltaTime;
     
@@ -175,7 +131,6 @@ void Player::update(float deltaTime) {
                 newPosition.x = platformBounds.left - playerBounds.width;
                 velocity.x = -velocity.x * 0.8f; // Bật ngược lại với hệ số giảm
             }
-            // Va chạm từ bên phải platform
             else if (velocity.x < 0 && playerBounds.left - velocity.x * deltaTime >= platformRight - COLLISION_THRESHOLD) {
                 newPosition.x = platformBounds.left + platformBounds.width;
                 velocity.x = -velocity.x * 0.8f; // Bật ngược lại với hệ số giảm
@@ -189,7 +144,7 @@ void Player::update(float deltaTime) {
 
     // Xử lý di chuyển dọc (trục Y)
     newPosition.y += velocity.y * deltaTime;
-    isGrounded = false;
+    isGround = false;
 
     // Kiểm tra va chạm dọc
     for (const auto& platform : solidTiles) {
@@ -208,7 +163,7 @@ void Player::update(float deltaTime) {
                     // Đặt player ngay trên đỉnh platform
                     newPosition.y = platformTop - playerBounds.height;
                     velocity.y = 0.f;
-                    isGrounded = true;
+                    isGround = true;
                 }
             } else if (velocity.y < 0) { // Nhảy lên
                 // Kiểm tra va chạm với đáy platform
@@ -242,26 +197,7 @@ void Player::update(float deltaTime) {
     }
 }
 
-void Player::draw(sf::RenderWindow& window) {
-    window.draw(shape);
-    if (isChargingJump) {
-        sf::View originalView = window.getView(); // Save current view
-        window.setView(window.getDefaultView());  // Switch to default view
-        window.draw(jumpChargeBarBorder);
-        window.draw(jumpChargeBar);
-        window.setView(originalView); // Restore original view
-    }
-}
-
-sf::RectangleShape Player::getJumpChargeBar() const {
-    return jumpChargeBar;
-}
-
-sf::RectangleShape Player::getJumpChargeBarBorder() const {
-    return jumpChargeBarBorder;
-}
-
-bool Player::checkWinCondition(const Map& gameMap) const {
+bool Player::checkWinCondition() const {
     sf::FloatRect playerBounds = shape.getGlobalBounds();
     sf::Vector2f endPos = gameMap.getPlayerEndPos();
     sf::Vector2f tileSize = gameMap.getTileSize();

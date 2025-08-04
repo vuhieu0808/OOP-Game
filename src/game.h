@@ -1,36 +1,35 @@
-#pragma once
+#ifndef GAME_H
+#define GAME_H
 
-#include <SFML/Graphics.hpp>
-#include "map.h"
-#include "camera.h"
 #include "player.h"
-#include "menu.h"
-#include "gameObserver.h"
+#include "menu/menu.h"
+#include <SFML/Graphics.hpp>
 
 const int WINDOW_WIDTH = 1920;
 const int WINDOW_HEIGHT = 1080;
-
-class Player;
 
 class Game {
 private:
     sf::RenderWindow window;
     sf::Clock clock;
-    Map gameMap;
+
     Player player;
-    Camera camera;
+    Menu menu;
+
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
 
-    Menu menu;
+    Map gameMap;
+    Camera camera;
 
-    std::vector<IGameObserver*> observers;
+    void updateGame(float deltaTime);
+    void renderGame();
+    void checkWinCondition();
 
 public:
     Game();
-    void run();
 
-    void addObserver(IGameObserver* observer);
-    void removeObserver(IGameObserver* observer);
-    void notifyObservers(GameEvent event);
+    void run();
 };
+
+#endif // GAME_H
