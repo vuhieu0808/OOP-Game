@@ -1,0 +1,300 @@
+@startuml GameClassDiagram
+
+!define DARKBLUE
+!theme plain
+
+' Main Game Class
+class Game {
+    - window : sf::RenderWindow
+    - clock : sf::Clock
+    - player : Player
+    - menu : Menu
+    - backgroundTexture : sf::Texture
+    - backgroundSprite : sf::Sprite
+    - gameMap : Map
+    - camera : Camera
+    + Game()
+    + run() : void
+    - updateGame(deltaTime : float) : void
+    - renderGame() : void
+    - checkWinCondition() : void
+}
+
+' GameObject Base Class
+abstract class GameObject {
+    # shape : sf::Sprite
+    # texture : sf::Texture
+    # size : sf::Vector2f
+    + GameObject(textureFile : string)
+    + {abstract} draw(window : sf::RenderWindow&) : void
+    + setPosition(position : sf::Vector2f) : void
+    + setSize(newSize : sf::Vector2f) : void
+    + setTexture(newTexture : sf::Texture) : void
+    + setScale(scaleX : float, scaleY : float) : void
+    + setOrigin(originX : float, originY : float) : void
+    + getGlobalBounds() : sf::FloatRect
+    + getPosition() : sf::Vector2f
+    + getSize() : sf::Vector2f
+}
+
+' Observer Pattern
+interface Observer {
+    + ~Observer()
+    + {abstract} onNotify(eventName : string) : void
+}
+
+class Subject {
+    - observers : vector<Observer*>
+    + addObserver(obs : Observer*) : void
+    + removeObserver(obs : Observer*) : void
+    # notify(eventName : string) : void
+}
+
+' Player State Enum
+enum PlayerState {
+    Idle
+    Walking
+    Jumping
+    ChargingJump
+}
+
+' Player Class
+class Player {
+    - velocity : sf::Vector2f
+    - currentState : PlayerState
+    - jumpCharge : float
+    - isChargingJump : bool
+    - moveDirection : int
+    - isGround : bool
+    - isJumping : bool
+    - isFacingRight : bool
+    - jumpChargeBar : sf::RectangleShape
+    - jumpChargeBarBorder : sf::RectangleShape
+    - gameMap : Map&
+    + Player(textureFile : string, map : Map&)
+    + draw(window : sf::RenderWindow&) : void
+    + update(deltaTime : float) : void
+    + handleInput() : void
+    + setVelocityX(vx : float) : void
+    + setVelocityY(vy : float) : void
+    + startCharging() : void
+    + stopCharging() : void
+    + jump() : void
+    + checkWinCondition() : bool
+}
+
+' Command Pattern
+interface Command {
+    + ~Command()
+    + {abstract} execute(player : Player&) : void
+}
+
+class MoveLeftCommand {
+    + execute(player : Player&) : void
+}
+
+class MoveRightCommand {
+    + execute(player : Player&) : void
+}
+
+class StopCommand {
+    + execute(player : Player&) : void
+}
+
+class StartChargingCommand {
+    + execute(player : Player&) : void
+}
+
+class ChargeJumpCommand {
+    + execute(player : Player&) : void
+}
+
+class ReleaseJumpCommand {
+    + execute(player : Player&) : void
+}
+
+' Input Handler - Singleton
+class InputHandler <<singleton>> {
+    - {static} instance : InputHandler*
+    - left : unique_ptr<Command>
+    - right : unique_ptr<Command>
+    - stop : unique_ptr<Command>
+    - startCharge : unique_ptr<Command>
+    - charge : unique_ptr<Command>
+    - releaseJump : unique_ptr<Command>
+    - InputHandler()
+    + {static} getInstance() : InputHandler&
+    + handleInput(player : Player&) : void
+}
+
+' Animation System
+class AnimationSystem {
+    - player : Player*
+    - idleTexture : sf::Texture
+    - walkTexture : sf::Texture
+    - jumpTexture : sf::Texture
+    - chargeTexture : sf::Texture
+    + AnimationSystem(player : Player*)
+    + onNotify(eventName : string) : void
+}
+
+' Map Class
+class Map {
+    - backgroundBackGrid : vector<vector<int>>
+    - backgroundFrontGrid : vector<vector<int>>
+    - mapGrid : vector<vector<int>>
+    - tileSize : sf::Vector2f
+    - backgroundBackTiles : vector<sf::Sprite>
+    - backgroundFrontTiles : vector<sf::Sprite>
+    - mapTiles : vector<sf::Sprite>
+    - playerStartPos : sf::Vector2f
+    - playerEndPos : sf::Vector2f
+    - solids : vector<sf::FloatRect>
+    - tileTextures : unordered_map<int, sf::Texture>
+    + Map()
+    + loadTexture(filename : string, tileId : int) : bool
+    + loadFromFile(filename : string) : bool
+    + draw(window : sf::RenderWindow&) : void
+    + getPlayerStartPos() : sf::Vector2f
+    + getPlayerEndPos() : sf::Vector2f
+    + getMapSize() : sf::Vector2f
+    + getSolidTiles() : vector<sf::FloatRect>
+    + getNearbyTiles(area : sf::FloatRect) : vector<sf::FloatRect>
+    + getTileSize() : sf::Vector2f
+}
+
+' Camera Class
+class Camera {
+    - view : sf::View
+    - screenSize : sf::Vector2f
+    - currentScreen : sf::Vector2i
+    - bounds : sf::FloatRect
+    + Camera(screenSize : sf::Vector2f)
+    + update(playerPosition : sf::Vector2f) : void
+    + applyTo(window : sf::RenderWindow&) : void
+    + setBounds(newBounds : sf::FloatRect) : void
+    + getCurrentScreen() : sf::Vector2i
+    + getScreenPosition() : sf::Vector2f
+    + getSize() : sf::Vector2f
+}
+
+' Menu State Enum
+enum MenuStateEnum {
+    Start
+    Settings
+    Pause
+    Win
+}
+
+' Menu System
+class Menu {
+    - window : sf::RenderWindow&
+    - font : sf::Font
+    - backgroundTexture : sf::Texture
+    - backgroundSprite : sf::Sprite
+    - currentState : MenuStateEnum
+    - currentStateObj : unique_ptr<MenuState>
+    - inputHandler : unique_ptr<MenuInputHandler>
+    - selectedMap : string
+    + Menu(window : sf::RenderWindow&)
+    + render() : void
+    + handleInput() : void
+    + changeState(newState : MenuStateEnum) : void
+    + getCurrentState() : MenuStateEnum
+    + getFont() : sf::Font&
+    + getSelectedMap() : string
+}
+
+abstract class MenuState {
+    # title : sf::Text
+    # menuItems : vector<sf::Text>
+    # currentIndex : int
+    # selectedIndex : int
+    + ~MenuState()
+    + {abstract} enter(menu : Menu&) : void
+    + {abstract} render(menu : Menu&) : void
+    + {abstract} onSelect(menu : Menu&) : void
+    + increaseIndex() : void
+    + decreaseIndex() : void
+    + selectItem() : void
+}
+
+class StartState {
+    + enter(menu : Menu&) : void
+    + render(menu : Menu&) : void
+    + onSelect(menu : Menu&) : void
+}
+
+class SettingsState {
+    + enter(menu : Menu&) : void
+    + render(menu : Menu&) : void
+    + onSelect(menu : Menu&) : void
+}
+
+class PauseState {
+    + enter(menu : Menu&) : void
+    + render(menu : Menu&) : void
+    + onSelect(menu : Menu&) : void
+}
+
+class WinState {
+    + enter(menu : Menu&) : void
+    + render(menu : Menu&) : void
+    + onSelect(menu : Menu&) : void
+}
+
+' Menu Command Pattern
+interface MenuCommand {
+    + ~MenuCommand()
+    + {abstract} execute(menu : Menu&) : bool
+}
+
+class NavigateCommand {
+    - direction : int
+    + NavigateCommand(dir : int)
+    + execute(menu : Menu&) : bool
+}
+
+class SelectCommand {
+    + execute(menu : Menu&) : bool
+}
+
+class MenuInputHandler {
+    - keyBindings : map<sf::Keyboard::Key, unique_ptr<MenuCommand>>
+    + MenuInputHandler()
+    + handleInput() : unique_ptr<MenuCommand>
+    - initializeKeyBindings() : void
+}
+
+' Relationships
+GameObject <|-- Player
+Subject <|-- Player
+Observer <|.. AnimationSystem
+Command <|.. MoveLeftCommand
+Command <|.. MoveRightCommand
+Command <|.. StopCommand
+Command <|.. StartChargingCommand
+Command <|.. ChargeJumpCommand
+Command <|.. ReleaseJumpCommand
+MenuState <|-- StartState
+MenuState <|-- SettingsState
+MenuState <|-- PauseState
+MenuState <|-- WinState
+MenuCommand <|.. NavigateCommand
+MenuCommand <|.. SelectCommand
+
+Game *-- Player
+Game *-- Menu
+Game *-- Map
+Game *-- Camera
+Player --> Map
+Player --> PlayerState
+Menu --> MenuStateEnum
+Menu *-- MenuState
+Menu *-- MenuInputHandler
+MenuInputHandler *-- MenuCommand
+InputHandler *-- Command
+AnimationSystem --> Player
+Subject o-- Observer
+
+@enduml

@@ -3,3 +3,10 @@ media/kenney_pixel-platformer
 *.exe
 .vscode
 lmeo/
+*.map
+media/lmao.jpg
+media/bricks.png
+media/mapsheet.png
+media/background_.jpg
+test.py
+copy_sfml_all.sh

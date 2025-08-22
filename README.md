@@ -15,7 +15,6 @@ SFML_Game_Project/
 ├── src/               # Game source code
 ├── main.cpp           # Entry point
 ├── game.bat           # Compile & run script for Windows
-├── copy_sfml_all.sh   # Script to collect SFML components
 ├── bin/               # Output .exe (created after build)
 └── README.md
 ```
@@ -62,16 +61,9 @@ This project includes:
 - Linker libraries (`libsfml-graphics.dll.a`, etc.)
 - DLLs (`sfml-graphics-2.dll`, `libfreetype-6.dll`, `libopenal-1.dll`, ...)
 
-All collected using the script: `copy_sfml_all.sh`.
-
 ---
 
 ## ✨ Notes
-
-- If you want to build a **standalone installer or ZIP** for others, use:
-  ```bash
-  bash package_project.sh
-  ```
 
 - Make sure `g++` from MinGW-w64 is on your PATH when using `game.bat`
 

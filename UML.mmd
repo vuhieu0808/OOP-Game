@@ -1,0 +1,300 @@
+classDiagram
+    %% Main Game Class
+    class Game {
+        -sf::RenderWindow window
+        -sf::Clock clock
+        -Player player
+        -Menu menu
+        -sf::Texture backgroundTexture
+        -sf::Sprite backgroundSprite
+        -Map gameMap
+        -Camera camera
+        +Game()
+        +run()
+        -updateGame(float deltaTime)
+        -renderGame()
+        -checkWinCondition()
+    }
+
+    %% GameObject Base Class
+    class GameObject {
+        #sf::Sprite shape
+        #sf::Texture texture
+        #sf::Vector2f size
+        +GameObject(string textureFile)
+        +virtual draw(sf::RenderWindow& window)
+        +setPosition(sf::Vector2f position)
+        +setSize(sf::Vector2f newSize)
+        +setTexture(sf::Texture newTexture)
+        +setScale(float scaleX, float scaleY)
+        +setOrigin(float originX, float originY)
+        +getGlobalBounds() sf::FloatRect
+        +getPosition() sf::Vector2f
+        +getSize() sf::Vector2f
+    }
+
+    %% Observer Pattern
+    class Observer {
+        <<interface>>
+        +virtual ~Observer()
+        +virtual onNotify(string eventName)*
+    }
+
+    class Subject {
+        -vector~Observer*~ observers
+        +addObserver(Observer* obs)
+        +removeObserver(Observer* obs)
+        #notify(string eventName)
+    }
+
+    %% Player State Enum (tách riêng)
+    class PlayerState {
+        <<enumeration>>
+        Idle
+        Walking
+        Jumping
+        ChargingJump
+    }
+
+    %% Player Class
+    class Player {
+        -sf::Vector2f velocity
+        -PlayerState currentState
+        -float jumpCharge
+        -bool isChargingJump
+        -int moveDirection
+        -bool isGround
+        -bool isJumping
+        -bool isFacingRight
+        -sf::RectangleShape jumpChargeBar
+        -sf::RectangleShape jumpChargeBarBorder
+        -Map& gameMap
+        +Player(string textureFile, Map& map)
+        +draw(sf::RenderWindow& window)
+        +update(float deltaTime)
+        +handleInput()
+        +setVelocityX(float vx)
+        +setVelocityY(float vy)
+        +startCharging()
+        +stopCharging()
+        +jump()
+        +checkWinCondition() bool
+    }
+
+    %% Command Pattern
+    class Command {
+        <<interface>>
+        +virtual ~Command()
+        +virtual execute(Player& player)*
+    }
+
+    class MoveLeftCommand {
+        +execute(Player& player)
+    }
+
+    class MoveRightCommand {
+        +execute(Player& player)
+    }
+
+    class StopCommand {
+        +execute(Player& player)
+    }
+
+    class StartChargingCommand {
+        +execute(Player& player)
+    }
+
+    class ChargeJumpCommand {
+        +execute(Player& player)
+    }
+
+    class ReleaseJumpCommand {
+        +execute(Player& player)
+    }
+
+    %% Input Handler
+    class InputHandler {
+        <<singleton>>
+        -static InputHandler* instance
+        -unique_ptr~Command~ left
+        -unique_ptr~Command~ right
+        -unique_ptr~Command~ stop
+        -unique_ptr~Command~ startCharge
+        -unique_ptr~Command~ charge
+        -unique_ptr~Command~ releaseJump
+        -InputHandler()
+        +static getInstance() InputHandler&
+        +handleInput(Player& player)
+    }
+
+    %% Animation System
+    class AnimationSystem {
+        -Player* player
+        -sf::Texture idleTexture
+        -sf::Texture walkTexture
+        -sf::Texture jumpTexture
+        -sf::Texture chargeTexture
+        +AnimationSystem(Player* player)
+        +onNotify(string eventName)
+    }
+
+    %% Map Class
+    class Map {
+        -vector~vector~int~~ backgroundBackGrid
+        -vector~vector~int~~ backgroundFrontGrid
+        -vector~vector~int~~ mapGrid
+        -sf::Vector2f tileSize
+        -vector~sf::Sprite~ backgroundBackTiles
+        -vector~sf::Sprite~ backgroundFrontTiles
+        -vector~sf::Sprite~ mapTiles
+        -sf::Vector2f playerStartPos
+        -sf::Vector2f playerEndPos
+        -vector~sf::FloatRect~ solids
+        -unordered_map~int, sf::Texture~ tileTextures
+        +Map()
+        +loadTexture(string filename, int tileId) bool
+        +loadFromFile(string filename) bool
+        +draw(sf::RenderWindow& window)
+        +getPlayerStartPos() sf::Vector2f
+        +getPlayerEndPos() sf::Vector2f
+        +getMapSize() sf::Vector2f
+        +getSolidTiles() vector~sf::FloatRect~
+        +getNearbyTiles(sf::FloatRect area) vector~sf::FloatRect~
+        +getTileSize() sf::Vector2f
+    }
+
+    %% Camera Class
+    class Camera {
+        -sf::View view
+        -sf::Vector2f screenSize
+        -sf::Vector2i currentScreen
+        -sf::FloatRect bounds
+        +Camera(sf::Vector2f screenSize)
+        +update(sf::Vector2f playerPosition)
+        +applyTo(sf::RenderWindow& window)
+        +setBounds(sf::FloatRect newBounds)
+        +getCurrentScreen() sf::Vector2i
+        +getScreenPosition() sf::Vector2f
+        +getSize() sf::Vector2f
+    }
+
+    %% Menu System
+    class MenuStateEnum {
+        <<enumeration>>
+        Start
+        Settings
+        Pause
+        Win
+    }
+
+    class Menu {
+        -sf::RenderWindow& window
+        -sf::Font font
+        -sf::Texture backgroundTexture
+        -sf::Sprite backgroundSprite
+        -MenuStateEnum currentState
+        -unique_ptr~MenuState~ currentStateObj
+        -unique_ptr~MenuInputHandler~ inputHandler
+        -string selectedMap
+        +Menu(sf::RenderWindow& window)
+        +render()
+        +handleInput()
+        +changeState(MenuStateEnum newState)
+        +getCurrentState() MenuStateEnum
+        +getFont() sf::Font&
+        +getSelectedMap() string
+    }
+
+    class MenuState {
+        <<abstract>>
+        #sf::Text title
+        #vector~sf::Text~ menuItems
+        #int currentIndex
+        #int selectedIndex
+        +virtual ~MenuState()
+        +virtual enter(Menu& menu)*
+        +virtual render(Menu& menu)*
+        +virtual onSelect(Menu& menu)*
+        +increaseIndex()
+        +decreaseIndex()
+        +selectItem()
+    }
+
+    class StartState {
+        +enter(Menu& menu)
+        +render(Menu& menu)
+        +onSelect(Menu& menu)
+    }
+
+    class SettingsState {
+        +enter(Menu& menu)
+        +render(Menu& menu)
+        +onSelect(Menu& menu)
+    }
+
+    class PauseState {
+        +enter(Menu& menu)
+        +render(Menu& menu)
+        +onSelect(Menu& menu)
+    }
+
+    class WinState {
+        +enter(Menu& menu)
+        +render(Menu& menu)
+        +onSelect(Menu& menu)
+    }
+
+    %% Menu Command Pattern
+    class MenuCommand {
+        <<interface>>
+        +virtual ~MenuCommand()
+        +virtual execute(Menu& menu) bool*
+    }
+
+    class NavigateCommand {
+        -int direction
+        +NavigateCommand(int dir)
+        +execute(Menu& menu) bool
+    }
+
+    class SelectCommand {
+        +execute(Menu& menu) bool
+    }
+
+    class MenuInputHandler {
+        -map< sf::Keyboard::Key, unique_ptr~MenuCommand~> keyBindings
+        +MenuInputHandler()
+        +handleInput() unique_ptr~MenuCommand~
+        -initializeKeyBindings()
+    }
+
+    %% Relationships
+    GameObject <|-- Player
+    Subject <|-- Player
+    Observer <|-- AnimationSystem
+    Command <|-- MoveLeftCommand
+    Command <|-- MoveRightCommand
+    Command <|-- StopCommand
+    Command <|-- StartChargingCommand
+    Command <|-- ChargeJumpCommand
+    Command <|-- ReleaseJumpCommand
+    MenuState <|-- StartState
+    MenuState <|-- SettingsState
+    MenuState <|-- PauseState
+    MenuState <|-- WinState
+    MenuCommand <|-- NavigateCommand
+    MenuCommand <|-- SelectCommand
+
+    Game *-- Player
+    Game *-- Menu
+    Game *-- Map
+    Game *-- Camera
+    Player --> Map
+    Player --> PlayerState
+    Menu --> MenuStateEnum
+    Menu *-- MenuState
+    Menu *-- MenuInputHandler
+    MenuInputHandler *-- MenuCommand
+    InputHandler *-- Command
+    AnimationSystem --> Player
+    Subject o-- Observer
