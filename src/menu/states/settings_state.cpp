@@ -16,7 +16,7 @@ void SettingsState::enter(Menu& menu) {
     
     // Map selection item
     sf::Text mapText;
-    mapText.setString("Map: " + mapFiles[selectedMapIndex]);
+    mapText.setString("Map: " + mapFiles[selectedMapIndex].displayName);
     mapText.setFont(menu.getFont());
     mapText.setCharacterSize(50);
     mapText.setFillColor(sf::Color::Yellow);
@@ -55,7 +55,7 @@ void SettingsState::onSelect(Menu& menu) {
             // Logic to change map can be added here
             break;
         case 1: // Back to Menu
-            menu.setSelectedMap(mapFiles[selectedMapIndex]);
+            menu.setSelectedMap(mapFiles[selectedMapIndex].filePath);
             menu.changeState(Menu::State::Start);
             break;
     }
@@ -63,14 +63,14 @@ void SettingsState::onSelect(Menu& menu) {
 
 void SettingsState::decreaseMapIndex() {
     selectedMapIndex = (selectedMapIndex - 1 + mapFiles.size()) % mapFiles.size();
-    menuItems[0].setString("Map: " + mapFiles[selectedMapIndex]);
+    menuItems[0].setString("Map: " + mapFiles[selectedMapIndex].displayName);
 }
 
 void SettingsState::increaseMapIndex() {
     selectedMapIndex = (selectedMapIndex + 1) % mapFiles.size();
-    menuItems[0].setString("Map: " + mapFiles[selectedMapIndex]);
+    menuItems[0].setString("Map: " + mapFiles[selectedMapIndex].displayName);
 }
 
 std::string SettingsState::getCurrentMap() const {
-    return mapFiles[selectedMapIndex];
+    return mapFiles[selectedMapIndex].filePath;
 }

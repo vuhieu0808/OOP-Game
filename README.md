@@ -47,7 +47,7 @@ The compiled game will appear in `bin/main.exe` and will run automatically.
 ## 🧪 Alternative: Compile manually with g++
 
 ```bash
-g++ -Iinclude -Llib -o bin/main.exe main.cpp src/*.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+g++ -Iinclude -Iinclude/tinyxml2 -Llib -o bin\main.exe main.cpp src\*.cpp src\menu\*.cpp src\menu\commands\*.cpp src\menu\states\*.cpp include/tinyxml2/tinyxml2.cpp -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
 xcopy /Y dll\*.dll bin\
 bin\main.exe
 ```
