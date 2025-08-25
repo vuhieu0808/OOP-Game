@@ -2,7 +2,7 @@
 #include "../menu.h"
 
 void StartState::enter(Menu& menu) {
-    title.setString("VU HIEU KING");
+    title.setString("JUMP MASTER");
     title.setFont(menu.getFont());
     title.setCharacterSize(80);
     title.setFillColor(sf::Color::Red);

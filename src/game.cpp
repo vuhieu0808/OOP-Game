@@ -3,7 +3,7 @@
 #include <iostream>
 
 Game::Game() :
-    window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Vuhieu King"),
+    window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Jump Master"),
     player("media/player/idle.png", gameMap),
     camera(sf::Vector2f(576, 270)),
     menu(window)  // Khởi tạo menu

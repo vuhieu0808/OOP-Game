@@ -12,7 +12,7 @@ Menu::Menu(sf::RenderWindow& window)
     inputHandler(std::make_unique<MenuInputHandler>()) {
     loadResources();
     changeState(State::Settings);
-    selectedMap = "media/map/map1.tmx"; // Default map
+    selectedMap = "media/map/map2.tmx"; // Default map
     changeState(State::Start);
 }
 
